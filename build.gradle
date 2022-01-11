@@ -1,0 +1,23 @@
+buildscript {
+    ext {
+        jjwtVersion = "0.11.2"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'com.sunnymix'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+}
