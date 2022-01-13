@@ -19,6 +19,17 @@ public class Jwt {
      * ...
      * args[N] claimN[=valueN]：数据项N=数据项N的值。注意，"=数据项N的值"是可选的，当不传值时会使用默认值。
      *
+     * shell script example:
+     * java -jar jwt.jar \
+     * encode \
+     * 3f3ef786b34d6dd716e7823c8b74a7a0e1f05aa5f3230588f6f5bcd00c6c8392 \
+     * issuer=sunnymix.com \
+     * subject=Sunny \
+     * audience=Others \
+     * accountId=123 \
+     * accountType=PATIENT \
+     * name=Sunny
+     *
      * @param args 参数列表
      */
     public static void main(String[] args) {
@@ -28,6 +39,7 @@ public class Jwt {
             return;
         }
         String command = argMap.get(command_key);
+        argMap.remove(command_key);
         if (command_encode.equals(command)) {
             encode(argMap);
         } else if (command_decode.equals(command)) {
@@ -55,7 +67,7 @@ public class Jwt {
         Key signKey = new SecretKeySpec(secret.getBytes(), signAlgorithm.getJcaName());
         jwt.signWith(signKey, signAlgorithm);
 
-        int expiry = Integer.getInteger(argMap.getOrDefault(expiry_key, "7"));
+        int expiry = Integer.parseInt(argMap.getOrDefault(expiry_key, "7"));
         argMap.remove(expiry_key);
 
         long nowMillis = System.currentTimeMillis();
@@ -64,6 +76,7 @@ public class Jwt {
         jwt.setIssuedAt(nowDate).setExpiration(expiryDate).setNotBefore(nowDate);
 
         // TODO: addClaims
+        System.out.println(argMap);
     }
 
     private static void decode(Map<String, String> argMap) {
