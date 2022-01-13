@@ -8,8 +8,8 @@ plugins {
     id 'java'
 }
 
-group 'com.sunnymix'
-version '1.0-SNAPSHOT'
+// group 'com.sunnymix'
+// version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -20,4 +20,28 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+}
+
+jar {
+    manifest {
+        attributes('Main-Class': 'Jwt')
+    }
+    from {
+        configurations.runtimeClasspath.collect {
+            exclude '.project'
+            exclude '.classpath'
+            exclude 'about.html'
+            exclude 'LICENSE'
+            exclude 'NOTICE'
+            exclude 'LICENSE.txt'
+            exclude 'NOTICE.txt'
+            exclude 'META-INF/*'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/DEPENDENCIES'
+
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
