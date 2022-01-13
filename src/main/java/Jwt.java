@@ -22,12 +22,12 @@ public class Jwt {
      * shell script example:
      * java -jar jwt.jar \
      * encode \
-     * 3f3ef786b34d6dd716e7823c8b74a7a0e1f05aa5f3230588f6f5bcd00c6c8392 \
+     * irVWQwBj7hEAvUMEEXTBCC0g1QMy1kgUUphIQcDjRwdiQU1DeHPiLpuNFEqieavK \
      * issuer=sunnymix.com \
      * subject=Sunny \
      * audience=Others \
      * accountId=123 \
-     * accountType=PATIENT \
+     * accountType=STAFF \
      * name=Sunny
      *
      * @param args 参数列表
