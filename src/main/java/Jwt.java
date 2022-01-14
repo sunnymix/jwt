@@ -18,7 +18,7 @@ public class Jwt {
      * args[2] claim1=value1：数据项1=数据项1的值。
      * ...
      * args[N] claimN[=valueN]：数据项N=数据项N的值。注意，"=数据项N的值"是可选的，当不传值时会使用默认值。
-     *
+     * <p>
      * shell script example:
      * java -jar jwt.jar \
      * encode \
@@ -33,12 +33,12 @@ public class Jwt {
      * @param args 参数列表
      */
     public static void main(String[] args) {
-        Map<String, String> argMap = parseArgMap(args);
+        Map<String, Object> argMap = parseArgMap(args);
         if (argMap == null) {
             System.out.println("args not enough");
             return;
         }
-        String command = argMap.get(command_key);
+        String command = argMap.get(command_key).toString();
         argMap.remove(command_key);
         if (command_encode.equals(command)) {
             encode(argMap);
@@ -47,27 +47,27 @@ public class Jwt {
         }
     }
 
-    private static void encode(Map<String, String> argMap) {
+    private static void encode(Map<String, Object> argMap) {
         JwtBuilder jwt = Jwts.builder();
         jwt.setId(UUID.randomUUID().toString().replace("-", ""));
 
-        jwt.setIssuer(argMap.getOrDefault(issuer_key, "example.org"));
+        jwt.setIssuer(argMap.getOrDefault(issuer_key, "example.org").toString());
         argMap.remove(issuer_key);
 
-        jwt.setSubject(argMap.getOrDefault(subject_key, "Me"));
+        jwt.setSubject(argMap.getOrDefault(subject_key, "Me").toString());
         argMap.remove(subject_key);
 
-        jwt.setAudience(argMap.getOrDefault(audience_key, "You"));
+        jwt.setAudience(argMap.getOrDefault(audience_key, "You").toString());
         argMap.remove(audience_key);
 
-        String secret = argMap.getOrDefault(secret_key, "");
+        String secret = argMap.getOrDefault(secret_key, "").toString();
         argMap.remove(secret_key);
 
         SignatureAlgorithm signAlgorithm = SignatureAlgorithm.HS512;
         Key signKey = new SecretKeySpec(secret.getBytes(), signAlgorithm.getJcaName());
         jwt.signWith(signKey, signAlgorithm);
 
-        int expiry = Integer.parseInt(argMap.getOrDefault(expiry_key, "7"));
+        int expiry = Integer.parseInt(argMap.getOrDefault(expiry_key, "7").toString());
         argMap.remove(expiry_key);
 
         long nowMillis = System.currentTimeMillis();
@@ -75,11 +75,12 @@ public class Jwt {
         Date expiryDate = new Date(nowMillis + (expiry * day_millis));
         jwt.setIssuedAt(nowDate).setExpiration(expiryDate).setNotBefore(nowDate);
 
-        // TODO: addClaims
-        System.out.println(argMap);
+        jwt.addClaims(argMap);
+        String jwtString = jwt.compact();
+        System.out.println(jwtString);
     }
 
-    private static void decode(Map<String, String> argMap) {
+    private static void decode(Map<String, Object> argMap) {
 
     }
 
@@ -98,11 +99,11 @@ public class Jwt {
 
     private static final long day_millis = 1000 * 60 * 60 * 24;
 
-    private static Map<String, String> parseArgMap(String[] args) {
+    private static Map<String, Object> parseArgMap(String[] args) {
         if (args.length < 2) {
             return null;
         }
-        Map<String, String> argMap = new HashMap<>();
+        Map<String, Object> argMap = new HashMap<>();
         argMap.put(command_key, args[0]);
         argMap.put(secret_key, args[1]);
         for (int i = 2; i < args.length; i++) {
