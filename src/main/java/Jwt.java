@@ -21,11 +21,10 @@ public class Jwt {
      * <p>
      * shell script example:
      * java -jar jwt.jar \
-     * encode \
-     * irVWQwBj7hEAvUMEEXTBCC0g1QMy1kgUUphIQcDjRwdiQU1DeHPiLpuNFEqieavK \
+     * encode irVWQwBj7hEAvUMEEXTBCC0g1QMy1kgUUphIQcDjRwdiQU1DeHPiLpuNFEqieavK \
      * issuer=sunnymix.com \
-     * subject=Sunny \
-     * audience=Others \
+     * subject=sunnymix.com \
+     * audience=Login \
      * accountId=123 \
      * accountType=STAFF \
      * name=Sunny
@@ -33,7 +32,7 @@ public class Jwt {
      * @param args 参数列表
      */
     public static void main(String[] args) {
-        Map<String, Object> argMap = parseArgMap(args);
+        Map<String, Object> argMap = _parseArgMap(args);
         if (argMap == null) {
             System.out.println("args not enough");
             return;
@@ -54,10 +53,10 @@ public class Jwt {
         jwt.setIssuer(argMap.getOrDefault(issuer_key, "example.org").toString());
         argMap.remove(issuer_key);
 
-        jwt.setSubject(argMap.getOrDefault(subject_key, "Me").toString());
+        jwt.setSubject(argMap.getOrDefault(subject_key, "example.org").toString());
         argMap.remove(subject_key);
 
-        jwt.setAudience(argMap.getOrDefault(audience_key, "You").toString());
+        jwt.setAudience(argMap.getOrDefault(audience_key, "Login").toString());
         argMap.remove(audience_key);
 
         String secret = argMap.getOrDefault(secret_key, "").toString();
@@ -99,7 +98,11 @@ public class Jwt {
 
     private static final long day_millis = 1000 * 60 * 60 * 24;
 
-    private static Map<String, Object> parseArgMap(String[] args) {
+    private static boolean _isNumber(String v) {
+        return v.matches("-?\\d+(\\.\\d+)?");
+    }
+
+    private static Map<String, Object> _parseArgMap(String[] args) {
         if (args.length < 2) {
             return null;
         }
@@ -111,9 +114,14 @@ public class Jwt {
             String[] kv = arg.split(kvGap);
             if (kv.length > 0) {
                 String k = kv[0];
-                String v = null;
+                Object v = null;
                 if (kv.length > 1) {
-                    v = kv[1];
+                    String vStr = kv[1];
+                    if (_isNumber(vStr)) {
+                        v = Long.parseLong(vStr);
+                    } else {
+                        v = vStr;
+                    }
                 }
                 argMap.put(k, v);
             }
